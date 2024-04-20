@@ -76,7 +76,7 @@ public class SemanticKernelCodeSnippet
 
         // Register the connector middleware to the kernel agent
         var semanticKernelAgentWithConnector = semanticKernelAgent
-            .RegisterMiddleware(connector); // middleware for non-streaming api
+            .RegisterStreamingMiddleware(connector); // middleware for non-streaming api
 
         // now semanticKernelAgentWithConnector supports more message types
         IMessage[] messages = [

@@ -7,8 +7,9 @@ public static class StreamingMiddlewareExtension
 {
     /// <summary>
     /// Register an <see cref="IStreamingMiddleware"/> to an existing <see cref="IStreamingAgent"/> and return a new agent with the registered middleware.
+    /// For registering an <see cref="IMiddleware"/>, please refer to <see cref="MiddlewareExtension.RegisterMiddleware{TAgent}(MiddlewareAgent{TAgent}, IMiddleware)"/>
     /// </summary>
-    public static MiddlewareStreamingAgent<TStreamingAgent> RegisterMiddleware<TStreamingAgent>(
+    public static MiddlewareStreamingAgent<TStreamingAgent> RegisterStreamingMiddleware<TStreamingAgent>(
         this TStreamingAgent agent,
         IStreamingMiddleware middleware)
         where TStreamingAgent : IStreamingAgent
@@ -21,8 +22,9 @@ public static class StreamingMiddlewareExtension
 
     /// <summary>
     /// Register an <see cref="IStreamingMiddleware"/> to an existing <see cref="IStreamingAgent"/> and return a new agent with the registered middleware.
+    /// For registering an <see cref="IMiddleware"/>, please refer to <see cref="MiddlewareExtension.RegisterMiddleware{TAgent}(MiddlewareAgent{TAgent}, IMiddleware)"/>
     /// </summary>
-    public static MiddlewareStreamingAgent<TAgent> RegisterMiddleware<TAgent>(
+    public static MiddlewareStreamingAgent<TAgent> RegisterStreamingMiddleware<TAgent>(
         this MiddlewareStreamingAgent<TAgent> agent,
         IStreamingMiddleware middleware)
         where TAgent : IStreamingAgent

@@ -80,6 +80,7 @@ public static class MiddlewareExtension
 
     /// <summary>
     /// Register a middleware to an existing agent and return a new agent with the middleware.
+    /// To register a streaming middleware, use <see cref="StreamingMiddlewareExtension.RegisterStreamingMiddleware{TAgent}(MiddlewareStreamingAgent{TAgent}, IStreamingMiddleware)"/>.
     /// </summary>
     public static MiddlewareAgent<TAgent> RegisterMiddleware<TAgent>(
         this TAgent agent,
@@ -97,6 +98,7 @@ public static class MiddlewareExtension
 
     /// <summary>
     /// Register a middleware to an existing agent and return a new agent with the middleware.
+    /// To register a streaming middleware, use <see cref="StreamingMiddlewareExtension.RegisterStreamingMiddleware{TAgent}(MiddlewareStreamingAgent{TAgent}, IStreamingMiddleware)"/>.
     /// </summary>
     public static MiddlewareAgent<TAgent> RegisterMiddleware<TAgent>(
         this TAgent agent,
@@ -110,6 +112,7 @@ public static class MiddlewareExtension
 
     /// <summary>
     /// Register a middleware to an existing agent and return a new agent with the middleware.
+    /// To register a streaming middleware, use <see cref="StreamingMiddlewareExtension.RegisterStreamingMiddleware{TAgent}(MiddlewareStreamingAgent{TAgent}, IStreamingMiddleware)"/>.
     /// </summary>
     public static MiddlewareAgent<TAgent> RegisterMiddleware<TAgent>(
         this MiddlewareAgent<TAgent> agent,
@@ -127,6 +130,7 @@ public static class MiddlewareExtension
 
     /// <summary>
     /// Register a middleware to an existing agent and return a new agent with the middleware.
+    /// To register a streaming middleware, use <see cref="StreamingMiddlewareExtension.RegisterStreamingMiddleware{TAgent}(MiddlewareStreamingAgent{TAgent}, IStreamingMiddleware)"/>.
     /// </summary>
     public static MiddlewareAgent<TAgent> RegisterMiddleware<TAgent>(
         this MiddlewareAgent<TAgent> agent,

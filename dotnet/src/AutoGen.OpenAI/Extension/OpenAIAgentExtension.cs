@@ -17,7 +17,7 @@ public static class OpenAIAgentExtension
             connector = new OpenAIChatRequestMessageConnector();
         }
 
-        return agent.RegisterMiddleware(connector);
+        return agent.RegisterStreamingMiddleware(connector);
     }
 
     /// <summary>
@@ -32,6 +32,6 @@ public static class OpenAIAgentExtension
             connector = new OpenAIChatRequestMessageConnector();
         }
 
-        return agent.RegisterMiddleware(connector);
+        return agent.RegisterStreamingMiddleware(connector);
     }
 }

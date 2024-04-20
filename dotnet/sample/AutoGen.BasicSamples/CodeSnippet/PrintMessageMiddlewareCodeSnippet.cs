@@ -17,7 +17,7 @@ internal class PrintMessageMiddlewareCodeSnippet
         var openaiClient = new OpenAIClient(endpoint, new AzureKeyCredential(config.ApiKey));
         var openaiMessageConnector = new OpenAIChatRequestMessageConnector();
         var agent = new OpenAIChatAgent(openaiClient, "assistant", config.DeploymentName)
-            .RegisterMiddleware(openaiMessageConnector);
+            .RegisterStreamingMiddleware(openaiMessageConnector);
 
         #region PrintMessageMiddleware
         var agentWithPrintMessageMiddleware = agent
@@ -36,7 +36,7 @@ internal class PrintMessageMiddlewareCodeSnippet
 
         #region print_message_streaming
         var streamingAgent = new OpenAIChatAgent(openaiClient, "assistant", config.DeploymentName)
-            .RegisterMiddleware(openaiMessageConnector)
+            .RegisterStreamingMiddleware(openaiMessageConnector)
             .RegisterPrintMessage();
 
         await streamingAgent.SendAsync("write a long poem");

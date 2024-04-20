@@ -17,7 +17,7 @@ public static class SemanticKernelAgentExtension
             connector = new SemanticKernelChatMessageContentConnector();
         }
 
-        return agent.RegisterMiddleware(connector);
+        return agent.RegisterStreamingMiddleware(connector);
     }
 
     /// <summary>
@@ -32,6 +32,6 @@ public static class SemanticKernelAgentExtension
             connector = new SemanticKernelChatMessageContentConnector();
         }
 
-        return agent.RegisterMiddleware(connector);
+        return agent.RegisterStreamingMiddleware(connector);
     }
 }

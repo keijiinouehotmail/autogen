@@ -94,7 +94,7 @@ public class GPTAgent : IStreamingAgent
         if (this.functionMap is not null)
         {
             var functionMapMiddleware = new FunctionCallMiddleware(functionMap: this.functionMap);
-            agent = agent.RegisterMiddleware(functionMapMiddleware);
+            agent = agent.RegisterStreamingMiddleware(functionMapMiddleware);
         }
 
         return await agent.GenerateReplyAsync(messages, options, cancellationToken);
@@ -109,7 +109,7 @@ public class GPTAgent : IStreamingAgent
         if (this.functionMap is not null)
         {
             var functionMapMiddleware = new FunctionCallMiddleware(functionMap: this.functionMap);
-            agent = agent.RegisterMiddleware(functionMapMiddleware);
+            agent = agent.RegisterStreamingMiddleware(functionMapMiddleware);
         }
 
         return agent.GenerateStreamingReplyAsync(messages, options, cancellationToken);
