@@ -15,9 +15,7 @@ public static class MistralAgentExtension
             connector = new MistralChatMessageConnector();
         }
 
-        return agent.RegisterStreamingMiddleware(connector)
-                    .RegisterMiddleware(connector);
-
+        return agent.RegisterMiddleware(connector);
     }
 
     public static MiddlewareStreamingAgent<MistralClientAgent> RegisterMessageConnector(
@@ -28,7 +26,6 @@ public static class MistralAgentExtension
             connector = new MistralChatMessageConnector();
         }
 
-        return agent.RegisterStreamingMiddleware(connector)
-                    .RegisterMiddleware(connector);
+        return agent.RegisterMiddleware(connector);
     }
 }

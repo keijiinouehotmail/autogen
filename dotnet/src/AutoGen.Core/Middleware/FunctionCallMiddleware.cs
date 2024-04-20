@@ -29,7 +29,7 @@ namespace AutoGen.Core;
 /// If the streaming reply from the inner agent is other types of message, the most recent message will be used to invoke the function.
 /// </para>
 /// </summary>
-public class FunctionCallMiddleware : IMiddleware, IStreamingMiddleware
+public class FunctionCallMiddleware : IStreamingMiddleware
 {
     private readonly IEnumerable<FunctionContract>? functions;
     private readonly IDictionary<string, Func<string, Task<string>>>? functionMap;

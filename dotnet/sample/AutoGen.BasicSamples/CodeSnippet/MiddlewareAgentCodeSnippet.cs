@@ -55,7 +55,7 @@ public class MiddlewareAgentCodeSnippet
         #region register_streaming_middleware
         var connector = new OpenAIChatRequestMessageConnector();
         var agent = streamingAgent!
-                .RegisterStreamingMiddleware(connector);
+                .RegisterMiddleware(connector);
         #endregion register_streaming_middleware
     }
 

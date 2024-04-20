@@ -3,4 +3,4 @@
 
 using AutoGen.BasicSample;
 
-await Example13_OpenAIAgent_JsonMode.RunAsync();
+await Sequential_GroupChat_Example.RunAsync();

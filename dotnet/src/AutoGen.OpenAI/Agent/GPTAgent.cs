@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoGen.OpenAI.Extension;
 using Azure.AI.OpenAI;
 
 namespace AutoGen.OpenAI;
@@ -89,8 +90,7 @@ public class GPTAgent : IStreamingAgent
         GenerateReplyOptions? options = null,
         CancellationToken cancellationToken = default)
     {
-        var oaiConnectorMiddleware = new OpenAIChatRequestMessageConnector();
-        var agent = this._innerAgent.RegisterMiddleware(oaiConnectorMiddleware);
+        var agent = this._innerAgent.RegisterMessageConnector();
         if (this.functionMap is not null)
         {
             var functionMapMiddleware = new FunctionCallMiddleware(functionMap: this.functionMap);
@@ -105,12 +105,11 @@ public class GPTAgent : IStreamingAgent
         GenerateReplyOptions? options = null,
         CancellationToken cancellationToken = default)
     {
-        var oaiConnectorMiddleware = new OpenAIChatRequestMessageConnector();
-        var agent = this._innerAgent.RegisterStreamingMiddleware(oaiConnectorMiddleware);
+        var agent = this._innerAgent.RegisterMessageConnector();
         if (this.functionMap is not null)
         {
             var functionMapMiddleware = new FunctionCallMiddleware(functionMap: this.functionMap);
-            agent = agent.RegisterStreamingMiddleware(functionMapMiddleware);
+            agent = agent.RegisterMiddleware(functionMapMiddleware);
         }
 
         return agent.GenerateStreamingReplyAsync(messages, options, cancellationToken);

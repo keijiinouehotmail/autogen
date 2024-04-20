@@ -119,8 +119,7 @@ public partial class OpenAIChatAgentTest
             .RegisterMessageConnector();
 
         var functionCallAgent = assistant
-            .RegisterMiddleware(functionCallMiddleware)
-            .RegisterStreamingMiddleware(functionCallMiddleware);
+            .RegisterMiddleware(functionCallMiddleware);
 
         var question = "What's the weather in Seattle";
         var messages = new IMessage[]
@@ -189,8 +188,7 @@ public partial class OpenAIChatAgentTest
             .RegisterMessageConnector();
 
         var functionCallAgent = assistant
-            .RegisterMiddleware(functionCallMiddleware)
-            .RegisterStreamingMiddleware(functionCallMiddleware);
+            .RegisterMiddleware(functionCallMiddleware);
 
         var question = "What's the weather in Seattle";
         var messages = new IMessage[]

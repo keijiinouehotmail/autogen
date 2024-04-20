@@ -36,7 +36,6 @@ internal class PrintMessageMiddlewareCodeSnippet
 
         #region print_message_streaming
         var streamingAgent = new OpenAIChatAgent(openaiClient, "assistant", config.DeploymentName)
-            .RegisterStreamingMiddleware(openaiMessageConnector)
             .RegisterMiddleware(openaiMessageConnector)
             .RegisterPrintMessage();
 
