@@ -1,3 +1,6 @@
+##### Update
+- Add `AutoGen.Mistral` package
+- [API Breaking Change] Update the return type of `IStreamingAgent.GenerateStreamingReplyAsync` from `Task<IAsyncEnumerable<IStreamingMessage>>` to `IAsyncEnumerable<IStreamingMessage>`
 ##### Update on 0.0.11 (2024-04-10)
 - Add link to Discord channel in nuget's readme.md
 - Document improvements
