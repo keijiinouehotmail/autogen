@@ -3,13 +3,12 @@
 
 using System.Collections.Generic;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace AutoGen.Core;
 
 internal class DelegateStreamingMiddleware : IStreamingMiddleware
 {
-    public delegate Task<IAsyncEnumerable<IStreamingMessage>> MiddlewareDelegate(
+    public delegate IAsyncEnumerable<IStreamingMessage> MiddlewareDelegate(
         MiddlewareContext context,
         IStreamingAgent agent,
         CancellationToken cancellationToken);
@@ -24,7 +23,7 @@ internal class DelegateStreamingMiddleware : IStreamingMiddleware
 
     public string? Name { get; }
 
-    public Task<IAsyncEnumerable<IStreamingMessage>> InvokeAsync(
+    public IAsyncEnumerable<IStreamingMessage> InvokeAsync(
                MiddlewareContext context,
                IStreamingAgent agent,
                CancellationToken cancellationToken = default)

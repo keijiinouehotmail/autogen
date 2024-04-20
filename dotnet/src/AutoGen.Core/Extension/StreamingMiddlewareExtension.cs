@@ -44,7 +44,7 @@ public static class StreamingMiddlewareExtension
     /// </summary>
     public static MiddlewareStreamingAgent<TAgent> RegisterStreamingMiddleware<TAgent>(
         this TAgent agent,
-        Func<MiddlewareContext, IStreamingAgent, CancellationToken, Task<IAsyncEnumerable<IStreamingMessage>>> func,
+        Func<MiddlewareContext, IStreamingAgent, CancellationToken, IAsyncEnumerable<IStreamingMessage>> func,
         string? middlewareName = null)
         where TAgent : IStreamingAgent
     {
@@ -58,7 +58,7 @@ public static class StreamingMiddlewareExtension
     /// </summary>
     public static MiddlewareStreamingAgent<TAgent> RegisterStreamingMiddleware<TAgent>(
         this MiddlewareStreamingAgent<TAgent> agent,
-        Func<MiddlewareContext, IStreamingAgent, CancellationToken, Task<IAsyncEnumerable<IStreamingMessage>>> func,
+        Func<MiddlewareContext, IStreamingAgent, CancellationToken, IAsyncEnumerable<IStreamingMessage>> func,
         string? middlewareName = null)
         where TAgent : IStreamingAgent
     {

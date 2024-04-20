@@ -42,7 +42,7 @@ public class MiddlewareStreamingAgent : MiddlewareAgent, IMiddlewareStreamAgent
     /// </summary>
     public IEnumerable<IStreamingMiddleware> StreamingMiddlewares => _streamingMiddlewares;
 
-    public Task<IAsyncEnumerable<IStreamingMessage>> GenerateStreamingReplyAsync(IEnumerable<IMessage> messages, GenerateReplyOptions? options = null, CancellationToken cancellationToken = default)
+    public IAsyncEnumerable<IStreamingMessage> GenerateStreamingReplyAsync(IEnumerable<IMessage> messages, GenerateReplyOptions? options = null, CancellationToken cancellationToken = default)
     {
         var agent = _agent;
         foreach (var middleware in _streamingMiddlewares)
@@ -89,7 +89,7 @@ public class MiddlewareStreamingAgent : MiddlewareAgent, IMiddlewareStreamAgent
             return await middleware.InvokeAsync(context, innerAgent, cancellationToken);
         }
 
-        public Task<IAsyncEnumerable<IStreamingMessage>> GenerateStreamingReplyAsync(IEnumerable<IMessage> messages, GenerateReplyOptions? options = null, CancellationToken cancellationToken = default)
+        public IAsyncEnumerable<IStreamingMessage> GenerateStreamingReplyAsync(IEnumerable<IMessage> messages, GenerateReplyOptions? options = null, CancellationToken cancellationToken = default)
         {
             if (streamingMiddleware is null)
             {

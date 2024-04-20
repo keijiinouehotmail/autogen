@@ -222,7 +222,7 @@ public partial class MistralClientAgentTests
         var question = new TextMessage(Role.User, "what's the weather in Seattle?");
         IMessage? finalReply = null;
 
-        await foreach (var reply in await agent.GenerateStreamingReplyAsync([question]))
+        await foreach (var reply in agent.GenerateStreamingReplyAsync([question]))
         {
             reply.From.Should().Be(agent.Name);
             if (reply is IMessage message)

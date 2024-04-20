@@ -100,7 +100,7 @@ public class GPTAgent : IStreamingAgent
         return await agent.GenerateReplyAsync(messages, options, cancellationToken);
     }
 
-    public async Task<IAsyncEnumerable<IStreamingMessage>> GenerateStreamingReplyAsync(
+    public IAsyncEnumerable<IStreamingMessage> GenerateStreamingReplyAsync(
         IEnumerable<IMessage> messages,
         GenerateReplyOptions? options = null,
         CancellationToken cancellationToken = default)
@@ -113,6 +113,6 @@ public class GPTAgent : IStreamingAgent
             agent = agent.RegisterStreamingMiddleware(functionMapMiddleware);
         }
 
-        return await agent.GenerateStreamingReplyAsync(messages, options, cancellationToken);
+        return agent.GenerateStreamingReplyAsync(messages, options, cancellationToken);
     }
 }

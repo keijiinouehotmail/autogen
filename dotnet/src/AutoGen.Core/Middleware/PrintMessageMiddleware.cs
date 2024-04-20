@@ -19,7 +19,7 @@ public class PrintMessageMiddleware : IMiddleware
         if (agent is IStreamingAgent streamingAgent)
         {
             IMessage? recentUpdate = null;
-            await foreach (var message in await streamingAgent.GenerateStreamingReplyAsync(context.Messages, context.Options, cancellationToken))
+            await foreach (var message in streamingAgent.GenerateStreamingReplyAsync(context.Messages, context.Options, cancellationToken))
             {
                 if (message is TextMessageUpdate textMessageUpdate)
                 {

@@ -60,7 +60,7 @@ public partial class OpenAICodeSnippet
         #endregion create_openai_chat_agent
 
         #region create_openai_chat_agent_streaming
-        var streamingReply = await openAIChatAgent.GenerateStreamingReplyAsync(new[] { chatMessageContent });
+        var streamingReply = openAIChatAgent.GenerateStreamingReplyAsync(new[] { chatMessageContent });
 
         await foreach (var streamingMessage in streamingReply)
         {

@@ -46,7 +46,7 @@ public partial class OpenAIChatAgentTest
         reply.As<MessageEnvelope<ChatResponseMessage>>().Content.Role.Should().Be(ChatRole.Assistant);
 
         // test streaming
-        var streamingReply = await openAIChatAgent.GenerateStreamingReplyAsync(new[] { chatMessageContent });
+        var streamingReply = openAIChatAgent.GenerateStreamingReplyAsync(new[] { chatMessageContent });
 
         await foreach (var streamingMessage in streamingReply)
         {
@@ -92,7 +92,7 @@ public partial class OpenAIChatAgentTest
         // test streaming
         foreach (var message in messages)
         {
-            var reply = await assistant.GenerateStreamingReplyAsync([message]);
+            var reply = assistant.GenerateStreamingReplyAsync([message]);
 
             await foreach (var streamingMessage in reply)
             {
@@ -148,7 +148,7 @@ public partial class OpenAIChatAgentTest
         // test streaming
         foreach (var message in messages)
         {
-            var reply = await functionCallAgent.GenerateStreamingReplyAsync([message]);
+            var reply = functionCallAgent.GenerateStreamingReplyAsync([message]);
             ToolCallMessage? toolCallMessage = null;
             await foreach (var streamingMessage in reply)
             {
@@ -219,7 +219,7 @@ public partial class OpenAIChatAgentTest
         // test streaming
         foreach (var message in messages)
         {
-            var reply = await functionCallAgent.GenerateStreamingReplyAsync([message]);
+            var reply = functionCallAgent.GenerateStreamingReplyAsync([message]);
             await foreach (var streamingMessage in reply)
             {
                 if (streamingMessage is not IMessage)

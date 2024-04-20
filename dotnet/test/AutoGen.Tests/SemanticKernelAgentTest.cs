@@ -44,7 +44,7 @@ public partial class SemanticKernelAgentTest
         reply.As<MessageEnvelope<ChatMessageContent>>().From.Should().Be("assistant");
 
         // test streaming
-        var streamingReply = await skAgent.GenerateStreamingReplyAsync(new[] { chatMessageContent });
+        var streamingReply = skAgent.GenerateStreamingReplyAsync(new[] { chatMessageContent });
 
         await foreach (var streamingMessage in streamingReply)
         {
@@ -88,7 +88,7 @@ public partial class SemanticKernelAgentTest
         // test streaming
         foreach (var message in messages)
         {
-            var reply = await skAgent.GenerateStreamingReplyAsync([message]);
+            var reply = skAgent.GenerateStreamingReplyAsync([message]);
 
             await foreach (var streamingMessage in reply)
             {

@@ -247,7 +247,7 @@ namespace AutoGen.Tests
             {
                 Temperature = 0,
             };
-            var replyStream = await agent.GenerateStreamingReplyAsync(messages: new[] { message, helloWorld }, option);
+            var replyStream = agent.GenerateStreamingReplyAsync(messages: new[] { message, helloWorld }, option);
             var answer = "[ECHO] Hello world";
             IStreamingMessage? finalReply = default;
             await foreach (var reply in replyStream)
@@ -288,7 +288,7 @@ namespace AutoGen.Tests
             {
                 Temperature = 0,
             };
-            var replyStream = await agent.GenerateStreamingReplyAsync(messages: new[] { message, helloWorld }, option);
+            var replyStream = agent.GenerateStreamingReplyAsync(messages: new[] { message, helloWorld }, option);
             var answer = "A B C D E F G H I J K L M N";
             TextMessage? finalReply = default;
             await foreach (var reply in replyStream)
