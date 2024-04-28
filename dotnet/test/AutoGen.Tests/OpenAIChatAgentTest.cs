@@ -118,6 +118,7 @@ public partial class OpenAIChatAgentTest
         MiddlewareStreamingAgent<OpenAIChatAgent> assistant = openAIChatAgent
             .RegisterMessageConnector();
 
+        assistant.StreamingMiddlewares.Count().Should().Be(1);
         var functionCallAgent = assistant
             .RegisterStreamingMiddleware(functionCallMiddleware);
 

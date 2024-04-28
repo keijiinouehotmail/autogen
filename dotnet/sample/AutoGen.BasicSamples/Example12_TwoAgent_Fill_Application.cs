@@ -88,7 +88,7 @@ public partial class TwoAgent_Fill_Application
             modelName: gpt3Config.DeploymentName,
             systemMessage: """You are a helpful application form assistant who saves progress while user fills application.""")
             .RegisterMessageConnector()
-            .RegisterStreamingMiddleware(functionCallConnector)
+            .RegisterMiddleware(functionCallConnector)
             .RegisterMiddleware(async (msgs, option, agent, ct) =>
             {
                 var lastUserMessage = msgs.Last() ?? throw new Exception("No user message found.");

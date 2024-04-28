@@ -1,21 +1,57 @@
-from pathlib import Path
+import os
 import sys
 import tempfile
+import uuid
+from pathlib import Path
+
 import pytest
+
 from autogen.agentchat.conversable_agent import ConversableAgent
 from autogen.code_utils import is_docker_running
 from autogen.coding.base import CodeBlock, CodeExecutor
-from autogen.coding.factory import CodeExecutorFactory
 from autogen.coding.docker_commandline_code_executor import DockerCommandLineCodeExecutor
+from autogen.coding.factory import CodeExecutorFactory
 from autogen.coding.local_commandline_code_executor import LocalCommandLineCodeExecutor
-from autogen.oai.openai_utils import config_list_from_json
 
-from conftest import MOCK_OPEN_AI_API_KEY, skip_openai, skip_docker
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+from conftest import MOCK_OPEN_AI_API_KEY, skip_docker  # noqa: E402
 
 if skip_docker or not is_docker_running():
     classes_to_test = [LocalCommandLineCodeExecutor]
 else:
     classes_to_test = [LocalCommandLineCodeExecutor, DockerCommandLineCodeExecutor]
+
+UNIX_SHELLS = ["bash", "sh", "shell"]
+WINDOWS_SHELLS = ["ps1", "pwsh", "powershell"]
+PYTHON_VARIANTS = ["python", "Python", "py"]
+
+
+@pytest.mark.parametrize(
+    "lang, should_execute",
+    [
+        ("python", False),  # Python should not execute
+        ("bash", False),  # Bash should execute
+        ("html", False),  # HTML should not execute
+        ("javascript", False),  # JavaScript should not execute
+    ],
+)
+def test_execution_policy_enforcement(lang, should_execute):
+    with tempfile.TemporaryDirectory() as temp_dir:
+        executor = LocalCommandLineCodeExecutor(
+            work_dir=temp_dir,
+            execution_policies={"python": False, "bash": False, "html": False, "javascript": False, "css": False},
+        )
+        code = "print('Hello, world!')" if lang == "python" else "echo 'Hello, world!'"
+        code_block = CodeBlock(code=code, language=lang)
+        result = executor.execute_code_blocks([code_block])
+
+        if should_execute:
+            assert "Hello, world!" in result.output, f"Expected execution for {lang}, but it didn't execute."
+        else:
+            assert "Hello, world!" not in result.output, f"Expected no execution for {lang}, but it executed."
+
+        # Ensure files are saved regardless of execution
+        assert result.code_file is not None, f"Expected code file to be saved for {lang}, but it wasn't."
 
 
 @pytest.mark.parametrize("cls", classes_to_test)
@@ -49,27 +85,30 @@ def test_commandline_executor_init(cls) -> None:
     assert executor.timeout == 10 and str(executor.work_dir) == "."
 
     # Try invalid working directory.
-    with pytest.raises(ValueError, match="Working directory .* does not exist."):
+    with pytest.raises(FileNotFoundError):
         executor = cls(timeout=111, work_dir="/invalid/directory")
 
 
+@pytest.mark.parametrize("py_variant", PYTHON_VARIANTS)
 @pytest.mark.parametrize("cls", classes_to_test)
-def test_commandline_executor_execute_code(cls) -> None:
+def test_commandline_executor_execute_code(cls, py_variant) -> None:
     with tempfile.TemporaryDirectory() as temp_dir:
         executor = cls(work_dir=temp_dir)
-        _test_execute_code(executor=executor)
+        _test_execute_code(py_variant, executor=executor)
 
 
-def _test_execute_code(executor: CodeExecutor) -> None:
+@pytest.mark.parametrize("py_variant", PYTHON_VARIANTS)
+def _test_execute_code(py_variant, executor: CodeExecutor) -> None:
+
     # Test single code block.
-    code_blocks = [CodeBlock(code="import sys; print('hello world!')", language="python")]
+    code_blocks = [CodeBlock(code="import sys; print('hello world!')", language=py_variant)]
     code_result = executor.execute_code_blocks(code_blocks)
     assert code_result.exit_code == 0 and "hello world!" in code_result.output and code_result.code_file is not None
 
     # Test multiple code blocks.
     code_blocks = [
-        CodeBlock(code="import sys; print('hello world!')", language="python"),
-        CodeBlock(code="a = 100 + 100; print(a)", language="python"),
+        CodeBlock(code="import sys; print('hello world!')", language=py_variant),
+        CodeBlock(code="a = 100 + 100; print(a)", language=py_variant),
     ]
     code_result = executor.execute_code_blocks(code_blocks)
     assert (
@@ -87,7 +126,7 @@ def _test_execute_code(executor: CodeExecutor) -> None:
 
     # Test running code.
     file_lines = ["import sys", "print('hello world!')", "a = 100 + 100", "print(a)"]
-    code_blocks = [CodeBlock(code="\n".join(file_lines), language="python")]
+    code_blocks = [CodeBlock(code="\n".join(file_lines), language=py_variant)]
     code_result = executor.execute_code_blocks(code_blocks)
     assert (
         code_result.exit_code == 0
@@ -101,6 +140,87 @@ def _test_execute_code(executor: CodeExecutor) -> None:
         code_lines = f.readlines()
         for file_line, code_line in zip(file_lines, code_lines):
             assert file_line.strip() == code_line.strip()
+
+
+def test_local_commandline_code_executor_save_files() -> None:
+    with tempfile.TemporaryDirectory() as temp_dir:
+        executor = LocalCommandLineCodeExecutor(work_dir=temp_dir)
+        _test_save_files(executor, save_file_only=False)
+
+
+def test_local_commandline_code_executor_save_files_only() -> None:
+    with tempfile.TemporaryDirectory() as temp_dir:
+        # Using execution_policies to specify that no languages should execute
+        executor = LocalCommandLineCodeExecutor(
+            work_dir=temp_dir,
+            execution_policies={"python": False, "bash": False, "javascript": False, "html": False, "css": False},
+        )
+        _test_save_files(executor, save_file_only=True)
+
+
+def _test_save_files(executor: CodeExecutor, save_file_only: bool) -> None:
+
+    def _check_output(code_result: CodeBlock, expected_output: str) -> None:
+        if save_file_only:
+            return expected_output not in code_result.output
+        else:
+            return expected_output in code_result.output
+
+    # Test executable code block.
+
+    # Test saving to a given filename, Python.
+    code_blocks = [CodeBlock(code="# filename: test.py\nimport sys; print('hello world!')", language="python")]
+    code_result = executor.execute_code_blocks(code_blocks)
+    assert (
+        code_result.exit_code == 0 and _check_output(code_result, "hello world!") and code_result.code_file is not None
+    )
+    assert os.path.basename(code_result.code_file) == "test.py"
+
+    # Test saving to a given filename without "filename" prefix, Python.
+    code_blocks = [CodeBlock(code="# test.py\nimport sys; print('hello world!')", language="python")]
+    code_result = executor.execute_code_blocks(code_blocks)
+    assert (
+        code_result.exit_code == 0 and _check_output(code_result, "hello world!") and code_result.code_file is not None
+    )
+    assert os.path.basename(code_result.code_file) == "test.py"
+
+    # Test non-executable code block.
+
+    # Test saving to a given filename, Javascript.
+    code_blocks = [CodeBlock(code="// filename: test.js\nconsole.log('hello world!')", language="javascript")]
+    code_result = executor.execute_code_blocks(code_blocks)
+    assert code_result.exit_code == 0 and "hello world!" not in code_result.output and code_result.code_file is not None
+    assert os.path.basename(code_result.code_file) == "test.js"
+
+    # Test saving to a given filename without "filename" prefix, Javascript.
+    code_blocks = [CodeBlock(code="// test.js\nconsole.log('hello world!')", language="javascript")]
+    code_result = executor.execute_code_blocks(code_blocks)
+    assert code_result.exit_code == 0 and "hello world!" not in code_result.output and code_result.code_file is not None
+    assert os.path.basename(code_result.code_file) == "test.js"
+
+    # Test saving to a given filename, CSS.
+    code_blocks = [CodeBlock(code="/* filename: test.css */\nh1 { color: red; }", language="css")]
+    code_result = executor.execute_code_blocks(code_blocks)
+    assert code_result.exit_code == 0 and "hello world!" not in code_result.output and code_result.code_file is not None
+    assert os.path.basename(code_result.code_file) == "test.css"
+
+    # Test saving to a given filename without "filename" prefix, CSS.
+    code_blocks = [CodeBlock(code="/* test.css */\nh1 { color: red; }", language="css")]
+    code_result = executor.execute_code_blocks(code_blocks)
+    assert code_result.exit_code == 0 and "hello world!" not in code_result.output and code_result.code_file is not None
+    assert os.path.basename(code_result.code_file) == "test.css"
+
+    # Test saving to a given filename, HTML.
+    code_blocks = [CodeBlock(code="<!-- filename: test.html -->\n<h1>hello world!</h1>", language="html")]
+    code_result = executor.execute_code_blocks(code_blocks)
+    assert code_result.exit_code == 0 and "hello world!" not in code_result.output and code_result.code_file is not None
+    assert os.path.basename(code_result.code_file) == "test.html"
+
+    # Test saving to a given filename without "filename" prefix, HTML.
+    code_blocks = [CodeBlock(code="<!-- test.html -->\n<h1>hello world!</h1>", language="html")]
+    code_result = executor.execute_code_blocks(code_blocks)
+    assert code_result.exit_code == 0 and "hello world!" not in code_result.output and code_result.code_file is not None
+    assert os.path.basename(code_result.code_file) == "test.html"
 
 
 @pytest.mark.parametrize("cls", classes_to_test)
@@ -218,3 +338,31 @@ print("hello world")
         assert "test.py" in result.code_file
         assert (temp_dir / "test.py").resolve() == Path(result.code_file).resolve()
         assert (temp_dir / "test.py").exists()
+
+
+@pytest.mark.parametrize("cls", classes_to_test)
+@pytest.mark.parametrize("lang", WINDOWS_SHELLS + UNIX_SHELLS)
+def test_silent_pip_install(cls, lang: str) -> None:
+    # Ensure that the shell is supported.
+    lang = "ps1" if lang in ["powershell", "pwsh"] else lang
+
+    if sys.platform in ["win32"] and lang in UNIX_SHELLS:
+        pytest.skip("Linux shells are not supported on Windows.")
+    elif sys.platform not in ["win32"] and lang in WINDOWS_SHELLS:
+        pytest.skip("Windows shells are not supported on Unix.")
+
+    error_exit_code = 0 if sys.platform in ["win32"] else 1
+
+    executor = cls(timeout=600)
+
+    code = "pip install matplotlib numpy"
+    code_blocks = [CodeBlock(code=code, language=lang)]
+    code_result = executor.execute_code_blocks(code_blocks)
+    assert code_result.exit_code == 0 and code_result.output.strip() == ""
+
+    none_existing_package = uuid.uuid4().hex
+
+    code = f"pip install matplotlib_{none_existing_package}"
+    code_blocks = [CodeBlock(code=code, language=lang)]
+    code_result = executor.execute_code_blocks(code_blocks)
+    assert code_result.exit_code == error_exit_code and "ERROR: " in code_result.output

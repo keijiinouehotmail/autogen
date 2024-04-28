@@ -120,6 +120,8 @@ public partial class SemanticKernelAgentTest
         var skAgent = new SemanticKernelAgent(kernel, "assistant")
             .RegisterMessageConnector();
 
+        skAgent.StreamingMiddlewares.Count().Should().Be(1);
+
         var question = "What is the weather in Seattle?";
         var reply = await skAgent.SendAsync(question);
 
